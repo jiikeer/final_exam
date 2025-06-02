@@ -15,7 +15,7 @@ public class DifficultySelectionActivity extends AppCompatActivity {
 
         Button primaryButton = findViewById(R.id.primary_button);
         Button middleButton = findViewById(R.id.middle_button);
-        Button universityButton = findViewById(R.id.university_button);
+        Button seniorButton = findViewById(R.id.senior_button);
 
         primaryButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -31,10 +31,10 @@ public class DifficultySelectionActivity extends AppCompatActivity {
             }
         });
 
-        universityButton.setOnClickListener(new View.OnClickListener() {
+        seniorButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startMainActivity("university");
+                startMainActivity("senior");
             }
         });
     }

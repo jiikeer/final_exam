@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private IdiomDao idiomDao;
     private List<IdiomModel> currentIdioms;
     private int currentIdiomIndex = 0;
+    private int hintCount = 3;
     private List<CharacterComponent> components;
     private Map<String, List<String>> characterComponentsMap;
 
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView idiomExplanation;
     private Button nextButton;
     private Button backButton;
+    private Button hintButton;
+    private TextView fullIdiomDisplay; // 新增的 TextView
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class MainActivity extends AppCompatActivity {
         idiomExplanation = findViewById(R.id.idiom_explanation);
         nextButton = findViewById(R.id.next_button);
         backButton = findViewById(R.id.back_button);
+        hintButton = findViewById(R.id.hint_button);
+        fullIdiomDisplay = findViewById(R.id.full_idiom_display); // 初始化新增的 TextView
 
         // 初始化部件映射表
         initCharacterComponentsMap();
@@ -69,35 +74,72 @@ public class MainActivity extends AppCompatActivity {
                 // 处理返回操作，启动选择难度界面
                 Intent intent = new Intent(MainActivity.this, DifficultySelectionActivity.class);
                 startActivity(intent);
-                finish();
             }
         });
+
+        hintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hintCount > 0) {
+                    showHint();
+                    hintCount--;
+                    updateHintCounter();
+                    if (hintCount == 0) {
+                        hintButton.setEnabled(false);
+                    }
+                } else {
+                    Toast.makeText(MainActivity.this, "没有剩余提示次数了！", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // 让下一个按钮任何时候都可点击
+        nextButton.setEnabled(true);
+
+        updateHintCounter();
     }
 
+    // 部件替换（部分组成or谐音替换）
     private void initCharacterComponentsMap() {
         characterComponentsMap = new HashMap<>();
-        // 示例部件映射
-        characterComponentsMap.put("明", Arrays.asList("日", "月"));
-        characterComponentsMap.put("岩", Arrays.asList("山", "石"));
-        characterComponentsMap.put("杯", Arrays.asList("木", "不"));
-        characterComponentsMap.put("弓", Arrays.asList("弓"));
-        characterComponentsMap.put("蛇", Arrays.asList("舌", "虫")); // 谐音替换
-        characterComponentsMap.put("影", Arrays.asList("日", "京", "彡"));
-        // 更多映射...
+        // 小学
+        characterComponentsMap.put("烈", Arrays.asList("列"));
+        characterComponentsMap.put("怒", Arrays.asList("奴","心"));
+        characterComponentsMap.put("冲", Arrays.asList("中"));
+        characterComponentsMap.put("语", Arrays.asList("吾"));
+        characterComponentsMap.put("暖", Arrays.asList("日"));
+        characterComponentsMap.put("恩", Arrays.asList("因","心"));
+        characterComponentsMap.put("积", Arrays.asList("鸡","只","禾"));
+        characterComponentsMap.put("累", Arrays.asList("田"));
+        characterComponentsMap.put("蒂", Arrays.asList("弟","帝"));
+        characterComponentsMap.put("落", Arrays.asList("洛"));
+        characterComponentsMap.put("笨", Arrays.asList("本"));
+        // 中学
+        characterComponentsMap.put("憎", Arrays.asList("曾"));
+        characterComponentsMap.put("恙", Arrays.asList("羊"));
+        characterComponentsMap.put("涉", Arrays.asList("步"));
+        characterComponentsMap.put("非", Arrays.asList("飞"));
+        characterComponentsMap.put("厉", Arrays.asList("力","万"));
+        characterComponentsMap.put("匠", Arrays.asList("斤"));
+        characterComponentsMap.put("料", Arrays.asList("米","斗"));
+        // 高中
+        characterComponentsMap.put("耿", Arrays.asList("耳","火"));
+        characterComponentsMap.put("罪", Arrays.asList("非"));
+        characterComponentsMap.put("屡", Arrays.asList("尸","娄"));
+        characterComponentsMap.put("快", Arrays.asList("筷"));
     }
 
     private void loadIdioms(String level) {
         currentIdioms = idiomDao.getRandomIdiomsByLevel(level, 5);
         if (!currentIdioms.isEmpty()) {
             loadCurrentIdiom();
-        } else {
-            Toast.makeText(this, "没有找到成语数据", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void loadCurrentIdiom() {
         IdiomModel currentIdiom = currentIdioms.get(currentIdiomIndex);
         idiomExplanation.setText(currentIdiom.getExplanation());
+        fullIdiomDisplay.setVisibility(View.GONE); // 加载新成语时隐藏显示框
 
         // 解析成语为部件
         parseIdiomToComponents(currentIdiom.getIdiom());
@@ -125,11 +167,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 添加一些干扰部件
-        List<String> 干扰部件 = Arrays.asList("氵", "扌", "口", "心", "禾", "火", "土", "金");
-        int 干扰数量 = Math.max(2, 8 - components.size());
-        for (int i = 0; i < 干扰数量; i++) {
-            int index = random.nextInt(干扰部件.size());
-            components.add(new CharacterComponent(干扰部件.get(index), ""));
+        List<String> InterferingParts = Arrays.asList("氵", "扌", "口", "心", "禾", "火", "土", "金");
+        int InterferingNumber = Math.max(2, 8 - components.size());
+        for (int i = 0; i < InterferingNumber; i++) {
+            int index = random.nextInt(InterferingParts.size());
+            components.add(new CharacterComponent(InterferingParts.get(index), ""));
         }
 
         // 随机打乱部件顺序
@@ -152,8 +194,8 @@ public class MainActivity extends AppCompatActivity {
             });
 
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 120;
-            params.height = 120;
+            params.width = 200;
+            params.height = 200;
             params.setMargins(10, 10, 10, 10);
             componentsGrid.addView(button, params);
         }
@@ -176,8 +218,8 @@ public class MainActivity extends AppCompatActivity {
             });
 
             GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = 120;
-            params.height = 120;
+            params.width = 200;
+            params.height = 200;
             params.setMargins(10, 10, 10, 10);
             targetGrid.addView(targetButton, params);
         }
@@ -238,15 +280,63 @@ public class MainActivity extends AppCompatActivity {
 
         // 检查是否组成正确的成语
         if (formedIdiom.toString().equals(idiom)) {
+            String displayText = idiom + "：" + currentIdiom.getExplanation();
+            fullIdiomDisplay.setText(displayText);
+            fullIdiomDisplay.setVisibility(View.VISIBLE); // 显示完整的成语及其提示
             Toast.makeText(this, "恭喜！你组成了成语：" + idiom, Toast.LENGTH_SHORT).show();
-            nextButton.setEnabled(true);
-        } else {
-            nextButton.setEnabled(false);
         }
     }
 
     private void loadNextIdiom() {
         currentIdiomIndex = (currentIdiomIndex + 1) % currentIdioms.size();
         loadCurrentIdiom();
+    }
+
+    private void updateHintCounter() {
+        TextView hintCounter = findViewById(R.id.hint_counter);
+        hintCounter.setText("剩余提示次数: " + hintCount);
+    }
+
+
+    //找出所有未被猜出的字，随机选取一个来给出提示
+    private void showHint() {
+        IdiomModel currentIdiom = currentIdioms.get(currentIdiomIndex);
+        String idiom = currentIdiom.getIdiom();
+
+        List<Integer> emptyPositions = new ArrayList<>();
+        for (int i = 0; i < targetGrid.getChildCount(); i++) {
+            Button targetButton = (Button) targetGrid.getChildAt(i);
+            if (targetButton.getText().toString().isEmpty()) {
+                emptyPositions.add(i);
+            }
+        }
+
+        if (!emptyPositions.isEmpty()) {
+            Random random = new Random();
+            int randomIndex = random.nextInt(emptyPositions.size());
+            int position = emptyPositions.get(randomIndex);
+
+            String hintChar = String.valueOf(idiom.charAt(position));
+            Button targetButton = (Button) targetGrid.getChildAt(position);
+            targetButton.setText(hintChar);
+
+            // 找到对应的部件并标记为已使用
+            for (CharacterComponent component : components) {
+                if (component.getTargetCharacter().equals(hintChar) && !component.isUsed()) {
+                    component.setUsed(true);
+                    // 禁用对应的部件按钮
+                    for (int j = 0; j < componentsGrid.getChildCount(); j++) {
+                        Button componentButton = (Button) componentsGrid.getChildAt(j);
+                        if (componentButton.getText().toString().equals(component.getComponent())) {
+                            componentButton.setEnabled(false);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            checkCompletion();
+        }
     }
 }

@@ -11,11 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-
 
 public class MainActivity extends AppCompatActivity {
     private IdiomDao idiomDao;
@@ -24,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     private int currentIdiomIndex = 0;
     private int hintCount = 3;
     private List<CharacterComponent> components;
-    private Map<String, List<String>> characterComponentsMap;
 
     private GridLayout componentsGrid;
     private GridLayout targetGrid;
@@ -55,23 +51,14 @@ public class MainActivity extends AppCompatActivity {
         fullIdiomDisplay = findViewById(R.id.full_idiom_display);
         timerTextView = findViewById(R.id.timer_textview); // 初始化计时器显示
 
-        // 初始化部件映射表
-        initCharacterComponentsMap();
         // 获取难度参数并保存
         currentLevel = getIntent().getStringExtra("level");
         if (currentLevel == null) {
             currentLevel = "primary";
         }
 
-
-        // 获取难度参数
-        String level = getIntent().getStringExtra("level");
-        if (level == null) {
-            level = "primary"; // 默认难度
-        }
-
         // 加载指定难度的成语
-        loadIdioms(level);
+        loadIdioms(currentLevel);
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,36 +129,6 @@ public class MainActivity extends AppCompatActivity {
         timerHandler.removeCallbacks(timerRunnable);
     }
 
-    // 部件替换（部分组成or谐音替换）
-    private void initCharacterComponentsMap() {
-        characterComponentsMap = new HashMap<>();
-        // 小学
-        characterComponentsMap.put("烈", Arrays.asList("列"));
-        characterComponentsMap.put("怒", Arrays.asList("奴","心"));
-        characterComponentsMap.put("冲", Arrays.asList("中"));
-        characterComponentsMap.put("语", Arrays.asList("吾"));
-        characterComponentsMap.put("暖", Arrays.asList("日"));
-        characterComponentsMap.put("恩", Arrays.asList("因","心"));
-        characterComponentsMap.put("积", Arrays.asList("鸡","只","禾"));
-        characterComponentsMap.put("累", Arrays.asList("田"));
-        characterComponentsMap.put("蒂", Arrays.asList("弟","帝"));
-        characterComponentsMap.put("落", Arrays.asList("洛"));
-        characterComponentsMap.put("笨", Arrays.asList("本"));
-        // 中学
-        characterComponentsMap.put("憎", Arrays.asList("曾"));
-        characterComponentsMap.put("恙", Arrays.asList("羊"));
-        characterComponentsMap.put("涉", Arrays.asList("步"));
-        characterComponentsMap.put("非", Arrays.asList("飞"));
-        characterComponentsMap.put("厉", Arrays.asList("力","万"));
-        characterComponentsMap.put("匠", Arrays.asList("斤"));
-        characterComponentsMap.put("料", Arrays.asList("米","斗"));
-        // 高中
-        characterComponentsMap.put("耿", Arrays.asList("耳","火"));
-        characterComponentsMap.put("罪", Arrays.asList("非"));
-        characterComponentsMap.put("屡", Arrays.asList("尸","娄"));
-        characterComponentsMap.put("快", Arrays.asList("筷"));
-    }
-
     private void loadIdioms(String level) {
         currentIdioms = idiomDao.getRandomIdiomsByLevel(level, 5);
         if (!currentIdioms.isEmpty()) {
@@ -185,42 +142,42 @@ public class MainActivity extends AppCompatActivity {
         fullIdiomDisplay.setVisibility(View.GONE); // 加载新成语时隐藏显示框
 
         // 解析成语为部件
-        parseIdiomToComponents(currentIdiom.getIdiom());
+        parseIdiomToComponents(currentIdiom);
 
         // 显示部件和目标位置
         displayComponents();
         displayTargetPositions(currentIdiom.getIdiom());
     }
 
-    private void parseIdiomToComponents(String idiom) {
+    private void parseIdiomToComponents(IdiomModel idiomModel) {
         components = new ArrayList<>();
         Random random = new Random();
 
+        String idiom = idiomModel.getIdiom();
         for (char c : idiom.toCharArray()) {
             String character = String.valueOf(c);
-            if (characterComponentsMap.containsKey(character)) {
-                List<String> charComponents = characterComponentsMap.get(character);
-                for (String component : charComponents) {
-                    components.add(new CharacterComponent(component, character));
-                }
-            } else {
-                // 默认处理，将单字作为部件
-                components.add(new CharacterComponent(character, character));
-            }
+            components.add(new CharacterComponent(character, character));
         }
 
-        // 添加一些干扰部件
-        List<String> InterferingParts = Arrays.asList("氵", "扌", "口", "心", "禾", "火", "土", "金");
-        int InterferingNumber = Math.max(2, 8 - components.size());
-        for (int i = 0; i < InterferingNumber; i++) {
-            int index = random.nextInt(InterferingParts.size());
-            components.add(new CharacterComponent(InterferingParts.get(index), ""));
+        // 添加干扰部件
+        String interferingPartsStr = idiomModel.getInterferingParts();
+        String[] interferingPartsArray = interferingPartsStr.split("、");
+        List<String> interferingPartsList = new ArrayList<>(Arrays.asList(interferingPartsArray));
+        int interferingNumber = Math.max(2, 8 - components.size());
+
+        for (int i = 0; i < interferingNumber; i++) {
+            if (interferingPartsList.isEmpty()) {
+                break; // 如果干扰部件列表为空，停止添加
+            }
+            int index = random.nextInt(interferingPartsList.size());
+            String part = interferingPartsList.get(index);
+            components.add(new CharacterComponent(part, ""));
+            interferingPartsList.remove(index); // 移除已添加的干扰部件
         }
 
         // 随机打乱部件顺序
         java.util.Collections.shuffle(components);
     }
-
     private void displayComponents() {
         componentsGrid.removeAllViews();
         componentsGrid.setColumnCount(4);
@@ -317,14 +274,14 @@ public class MainActivity extends AppCompatActivity {
             Button targetButton = (Button) targetGrid.getChildAt(i);
             if (targetButton.getTag() != null) {
                 CharacterComponent component = (CharacterComponent) targetButton.getTag();
-                formedIdiom.append(component.getTargetCharacter());
+                formedIdiom.append(component.getComponent());
             }
         }
 
         // 检查是否组成正确的成语
         if (formedIdiom.toString().equals(idiom)) {
             String displayText = idiom + "：" + currentIdiom.getExplanation();
-        // 记录已猜对的成语
+            // 记录已猜对的成语
             idiomDao.recordGuessedIdiom(idiom, currentLevel);
             fullIdiomDisplay.setText(displayText);
             fullIdiomDisplay.setVisibility(View.VISIBLE); // 显示完整的成语及其提示
@@ -366,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
             // 找到对应的部件并标记为已使用
             for (CharacterComponent component : components) {
-                if (component.getTargetCharacter().equals(hintChar) && !component.isUsed()) {
+                if (component.getComponent().equals(hintChar) && !component.isUsed()) {
                     component.setUsed(true);
                     targetButton.setTag(component);
 

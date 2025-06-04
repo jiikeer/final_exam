@@ -1,49 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".DifficultySelectionActivity"
+    android:background="@color/white"
+    android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp"
-    android:id="@+id/main"
-    android:gravity="center">
+    tools:context=".DifficultySelectionActivity">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="选择成语难度"
-        android:textSize="24sp"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:text="选择成语难度"
+        android:textSize="24sp" />
 
     <Button
         android:id="@+id/primary_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="小学难度"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:text="小学难度" />
 
     <Button
         android:id="@+id/middle_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="中学难度"
         android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:text="中学难度" />
 
     <Button
         android:id="@+id/senior_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="高中难度"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:text="高中难度" />
+
     <Button
         android:id="@+id/record_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="查看猜对记录"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp"/>
+        android:layout_marginTop="20dp"
+        android:text="查看猜对记录" />
 </LinearLayout>

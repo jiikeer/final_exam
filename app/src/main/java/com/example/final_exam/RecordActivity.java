@@ -2,6 +2,7 @@ package com.example.final_exam;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -21,38 +22,37 @@ public class RecordActivity extends AppCompatActivity {
         IdiomDatabaseHelper dbHelper = new IdiomDatabaseHelper(this);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
+        // 使用 SQLiteQueryBuilder 进行联合查询
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setTables(IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS +
+                " JOIN " + IdiomDatabaseHelper.TABLE_IDIOMS +
+                " ON " + IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM +
+                " = " + IdiomDatabaseHelper.TABLE_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_IDIOM);
+
         // 确保包含 _id 列
         String[] columns = {
-                IdiomDatabaseHelper.COLUMN_ID + " AS _id", // 添加 _id 别名
-                IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM,
-                IdiomDatabaseHelper.COLUMN_GUESSED_LEVEL,
-                IdiomDatabaseHelper.COLUMN_TIMESTAMP
+                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_ID + " AS _id", // 添加 _id 别名
+                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM,
+                IdiomDatabaseHelper.TABLE_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_EXPLANATION,
+                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_TIMESTAMP
         };
 
-        Cursor cursor = db.query(
-                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS,
-                columns,
-                null, null, null, null,
-                IdiomDatabaseHelper.COLUMN_TIMESTAMP + " DESC"
+        Cursor cursor = queryBuilder.query(
+                db, columns, null, null, null, null,
+                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_TIMESTAMP + " DESC"
         );
 
         // 设置适配器
         String[] from = {
-                IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM,
-                IdiomDatabaseHelper.COLUMN_GUESSED_LEVEL,
-                IdiomDatabaseHelper.COLUMN_TIMESTAMP
+                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM,
+                IdiomDatabaseHelper.TABLE_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_EXPLANATION,
+                IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_TIMESTAMP
         };
 
-        int[] to = {R.id.idiom_text, R.id.level_text, R.id.date_text};
+        int[] to = {R.id.idiom_text, R.id.explanation_text, R.id.date_text};
 
         SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                this,
-                R.layout.record_item,
-                cursor,
-                from,
-                to,
-                0
-        );
+                this, R.layout.record_item, cursor, from, to, 0);
 
         ListView listView = findViewById(R.id.record_list);
         listView.setAdapter(adapter);

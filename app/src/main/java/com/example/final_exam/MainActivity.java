@@ -226,7 +226,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleComponentClick(CharacterComponent component, Button button) {
-        // 处理部件点击事件
         if (component.isUsed()) {
             return;
         }
@@ -278,14 +277,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        String formedIdiomStr = formedIdiom.toString();
         // 检查是否组成正确的成语
-        if (formedIdiom.toString().equals(idiom)) {
+        if (formedIdiomStr.equals(idiom)) {
             String displayText = idiom + "：" + currentIdiom.getExplanation();
             // 记录已猜对的成语
             idiomDao.recordGuessedIdiom(idiom, currentLevel);
             fullIdiomDisplay.setText(displayText);
-            fullIdiomDisplay.setVisibility(View.VISIBLE); // 显示完整的成语及其提示
+            fullIdiomDisplay.setVisibility(View.VISIBLE);
             Toast.makeText(this, "恭喜！你组成了成语：" + idiom, Toast.LENGTH_SHORT).show();
+        } else if (formedIdiomStr.length() == idiom.length()) {
+            //已填满但错误时提示
+            Toast.makeText(this, "拼错了！再试试吧~", Toast.LENGTH_SHORT).show();
         }
     }
 

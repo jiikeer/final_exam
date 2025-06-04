@@ -26,5 +26,6 @@
         android:layout_width="129dp"
         android:layout_height="65dp"
         android:layout_gravity="center_horizontal"
+        android:textSize="25sp"
         android:text="返回" />
 </LinearLayout>

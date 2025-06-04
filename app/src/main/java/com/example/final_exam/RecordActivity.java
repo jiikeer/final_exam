@@ -1,3 +1,4 @@
+//从数据库中查询猜对的成语信息，并在列表中显示，同时显示猜对成语的总数
 package com.example.final_exam;
 
 import android.database.Cursor;
@@ -11,6 +12,9 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.final_exam.DifficultySelectionActivity;
+import com.example.final_exam.IdiomDatabaseHelper;
 
 public class RecordActivity extends AppCompatActivity {
 
@@ -29,7 +33,6 @@ public class RecordActivity extends AppCompatActivity {
                 " ON " + IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM +
                 " = " + IdiomDatabaseHelper.TABLE_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_IDIOM);
 
-        // 确保包含 _id 列
         String[] columns = {
                 IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_ID + " AS _id", // 添加 _id 别名
                 IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + "." + IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM,

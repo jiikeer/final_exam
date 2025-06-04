@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="成语猜猜猜"
+            android:textStyle="bold"
             android:textSize="35sp" />
     </androidx.cardview.widget.CardView>
 

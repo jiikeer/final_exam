@@ -93,9 +93,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 让下一个按钮任何时候都可点击
-        nextButton.setEnabled(true);
-
         updateHintCounter();
 
         // 启动计时器

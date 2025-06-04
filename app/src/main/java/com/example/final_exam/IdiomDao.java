@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class IdiomDao {
     private IdiomDatabaseHelper dbHelper;
@@ -41,7 +40,7 @@ public class IdiomDao {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         dbHelper.insertGuessedIdiom(db, idiom, level);
     }
-
+    //根据难度级别随机获取指定数量的未猜对的成语
     public List<IdiomModel> getRandomIdiomsByLevel(String level, int count) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<IdiomModel> idioms = new ArrayList<>();
@@ -50,26 +49,21 @@ public class IdiomDao {
                 IdiomDatabaseHelper.COLUMN_IDIOM,
                 IdiomDatabaseHelper.COLUMN_EXPLANATION,
                 IdiomDatabaseHelper.COLUMN_LEVEL,
-                IdiomDatabaseHelper.COLUMN_INTERFERING_PARTS}; // 新增字段
+                IdiomDatabaseHelper.COLUMN_INTERFERING_PARTS};
         String selection = IdiomDatabaseHelper.COLUMN_LEVEL + " = ?";
         String[] selectionArgs = {level};
-        // 添加排除已猜对成语的逻辑
         String exclusionQuery = IdiomDatabaseHelper.COLUMN_IDIOM + " NOT IN (" +
                 "SELECT " + IdiomDatabaseHelper.COLUMN_GUESSED_IDIOM +
                 " FROM " + IdiomDatabaseHelper.TABLE_GUESSED_IDIOMS + ")";
-        // 修改：添加排序参数，按 ID 升序排列
-        String orderBy = IdiomDatabaseHelper.COLUMN_ID + " ASC";
-        // 修改：添加限制参数，获取前 count 条记录
+
         String limit = String.valueOf(count);
 
-        // 修改查询语句
         Cursor cursor = db.query(IdiomDatabaseHelper.TABLE_IDIOMS,
-                columns
-                ,
-                selection + " AND " + exclusionQuery, // 添加排除条件
+                columns,
+                selection + " AND " + exclusionQuery,
                 selectionArgs,
                 null, null,
-                "RANDOM()", // 改为随机排序
+                "RANDOM()", // 随机排序
                 limit);
 
         if (cursor.moveToFirst()) {
@@ -78,7 +72,7 @@ public class IdiomDao {
                 @SuppressLint("Range") String idiom = cursor.getString(cursor.getColumnIndex(IdiomDatabaseHelper.COLUMN_IDIOM));
                 @SuppressLint("Range") String explanation = cursor.getString(cursor.getColumnIndex(IdiomDatabaseHelper.COLUMN_EXPLANATION));
                 @SuppressLint("Range") String idiomLevel = cursor.getString(cursor.getColumnIndex(IdiomDatabaseHelper.COLUMN_LEVEL));
-                @SuppressLint("Range") String interferingParts = cursor.getString(cursor.getColumnIndex(IdiomDatabaseHelper.COLUMN_INTERFERING_PARTS)); // 新增字段
+                @SuppressLint("Range") String interferingParts = cursor.getString(cursor.getColumnIndex(IdiomDatabaseHelper.COLUMN_INTERFERING_PARTS));
                 idioms.add(new IdiomModel(id, idiom, explanation, idiomLevel, interferingParts));
             } while (cursor.moveToNext());
         }

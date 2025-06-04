@@ -1,3 +1,4 @@
+//插入成语数据and记录已猜对成语数据
 package com.example.final_exam;
 
 import android.content.ContentValues;
@@ -14,7 +15,7 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_IDIOM = "idiom";
     public static final String COLUMN_EXPLANATION = "explanation";
     public static final String COLUMN_LEVEL = "level";
-    public static final String COLUMN_INTERFERING_PARTS = "interfering_parts"; // 新增字段
+    public static final String COLUMN_INTERFERING_PARTS = "interfering_parts";
 
     // 添加新表记录猜对的成语
     public static final String TABLE_GUESSED_IDIOMS = "guessed_idioms";
@@ -24,7 +25,7 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_GUESSED_IDIOMS =
             "CREATE TABLE " + TABLE_GUESSED_IDIOMS + " (" +
-                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // 这个就是 _id
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_GUESSED_IDIOM + " TEXT NOT NULL, " +
                     COLUMN_GUESSED_LEVEL + " TEXT NOT NULL, " +
                     COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP);";
@@ -35,7 +36,7 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_IDIOM + " TEXT NOT NULL, " +
                     COLUMN_EXPLANATION + " TEXT, " +
                     COLUMN_LEVEL + " TEXT NOT NULL, " +
-                    COLUMN_INTERFERING_PARTS + " TEXT);"; // 新增字段
+                    COLUMN_INTERFERING_PARTS + " TEXT);";
 
     public IdiomDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -44,7 +45,7 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_IDIOMS);
-        db.execSQL(CREATE_TABLE_GUESSED_IDIOMS); // 添加新表
+        db.execSQL(CREATE_TABLE_GUESSED_IDIOMS);
         // 初始化成语数据
         initIdiomData(db);
     }
@@ -102,7 +103,7 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
         db.insert(TABLE_IDIOMS, null, values);
     }
 
-    // 添加记录猜对成语的方法
+    // 记录猜对成语
     public void insertGuessedIdiom(SQLiteDatabase db, String idiom, String level) {
         ContentValues values = new ContentValues();
         values.put(COLUMN_GUESSED_IDIOM, idiom);

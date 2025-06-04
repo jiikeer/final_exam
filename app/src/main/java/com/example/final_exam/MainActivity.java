@@ -2,11 +2,8 @@ package com.example.final_exam;
 
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.activity.EdgeToEdge;
+import android.os.Handler;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.GridLayout;
@@ -19,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+
 public class MainActivity extends AppCompatActivity {
     private IdiomDao idiomDao;
+    private String currentLevel; // 当前难度变量
     private List<IdiomModel> currentIdioms;
     private int currentIdiomIndex = 0;
     private int hintCount = 3;
@@ -33,7 +32,13 @@ public class MainActivity extends AppCompatActivity {
     private Button nextButton;
     private Button backButton;
     private Button hintButton;
-    private TextView fullIdiomDisplay; // 新增的 TextView
+    private TextView fullIdiomDisplay;
+    private TextView timerTextView; // 计时器显示
+
+    // 计时器相关变量
+    private long startTime = 0;
+    private Handler timerHandler = new Handler();
+    private Runnable timerRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,10 +52,17 @@ public class MainActivity extends AppCompatActivity {
         nextButton = findViewById(R.id.next_button);
         backButton = findViewById(R.id.back_button);
         hintButton = findViewById(R.id.hint_button);
-        fullIdiomDisplay = findViewById(R.id.full_idiom_display); // 初始化新增的 TextView
+        fullIdiomDisplay = findViewById(R.id.full_idiom_display);
+        timerTextView = findViewById(R.id.timer_textview); // 初始化计时器显示
 
         // 初始化部件映射表
         initCharacterComponentsMap();
+        // 获取难度参数并保存
+        currentLevel = getIntent().getStringExtra("level");
+        if (currentLevel == null) {
+            currentLevel = "primary";
+        }
+
 
         // 获取难度参数
         String level = getIntent().getStringExtra("level");
@@ -74,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                 // 处理返回操作，启动选择难度界面
                 Intent intent = new Intent(MainActivity.this, DifficultySelectionActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -97,6 +110,36 @@ public class MainActivity extends AppCompatActivity {
         nextButton.setEnabled(true);
 
         updateHintCounter();
+
+        // 启动计时器
+        startTimer();
+    }
+
+    // 启动计时器
+    private void startTimer() {
+        startTime = System.currentTimeMillis();
+        timerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                long millis = System.currentTimeMillis() - startTime;
+                int seconds = (int) (millis / 1000);
+                int minutes = seconds / 60;
+                seconds = seconds % 60;
+
+                // 格式化时间显示
+                String time = String.format("已用时间: %02d:%02d", minutes, seconds);
+                timerTextView.setText(time);
+
+                // 每秒更新一次
+                timerHandler.postDelayed(this, 1000);
+            }
+        };
+        timerHandler.postDelayed(timerRunnable, 0);
+    }
+
+    // 停止计时器
+    private void stopTimer() {
+        timerHandler.removeCallbacks(timerRunnable);
     }
 
     // 部件替换（部分组成or谐音替换）
@@ -281,6 +324,8 @@ public class MainActivity extends AppCompatActivity {
         // 检查是否组成正确的成语
         if (formedIdiom.toString().equals(idiom)) {
             String displayText = idiom + "：" + currentIdiom.getExplanation();
+        // 记录已猜对的成语
+            idiomDao.recordGuessedIdiom(idiom, currentLevel);
             fullIdiomDisplay.setText(displayText);
             fullIdiomDisplay.setVisibility(View.VISIBLE); // 显示完整的成语及其提示
             Toast.makeText(this, "恭喜！你组成了成语：" + idiom, Toast.LENGTH_SHORT).show();
@@ -296,7 +341,6 @@ public class MainActivity extends AppCompatActivity {
         TextView hintCounter = findViewById(R.id.hint_counter);
         hintCounter.setText("剩余提示次数: " + hintCount);
     }
-
 
     //找出所有未被猜出的字，随机选取一个来给出提示
     private void showHint() {
@@ -324,7 +368,8 @@ public class MainActivity extends AppCompatActivity {
             for (CharacterComponent component : components) {
                 if (component.getTargetCharacter().equals(hintChar) && !component.isUsed()) {
                     component.setUsed(true);
-                    // 禁用对应的部件按钮
+                    targetButton.setTag(component);
+
                     for (int j = 0; j < componentsGrid.getChildCount(); j++) {
                         Button componentButton = (Button) componentsGrid.getChildAt(j);
                         if (componentButton.getText().toString().equals(component.getComponent())) {
@@ -338,5 +383,11 @@ public class MainActivity extends AppCompatActivity {
 
             checkCompletion();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopTimer();
     }
 }

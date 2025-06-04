@@ -18,10 +18,19 @@
         android:textSize="24sp" />
 
     <TextView
+        android:id="@+id/timer_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="已用时间: 00:00"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
         android:id="@+id/idiom_explanation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="成语提示"
+        android:text="成语解析"
         android:textSize="18sp"
         android:layout_marginBottom="16dp"/>
     <TextView
@@ -32,7 +41,6 @@
         android:textSize="14sp"
         android:layout_gravity="end"
         android:layout_marginBottom="8dp"/>
-
 
     <GridLayout
         android:id="@+id/target_grid"
@@ -67,11 +75,13 @@
             android:id="@+id/back_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="返回" />
+            android:layout_marginRight="5dp"
+            android:text="退出" />
         <Button
             android:id="@+id/hint_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
             android:text="提示" />
         <Button
             android:id="@+id/next_button"
@@ -80,5 +90,4 @@
             android:text="下一个" />
 
     </LinearLayout>
-
 </LinearLayout>

@@ -9,34 +9,41 @@
     android:id="@+id/main"
     android:gravity="center">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="选择成语难度"
-            android:textSize="24sp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择成语难度"
+        android:textSize="24sp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
 
-        <Button
-            android:id="@+id/primary_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="小学难度"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+    <Button
+        android:id="@+id/primary_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="小学难度"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
 
-        <Button
-            android:id="@+id/middle_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="中学难度"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="16dp"/>
+    <Button
+        android:id="@+id/middle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="中学难度"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"/>
 
-        <Button
-            android:id="@+id/senior_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="高中难度"
-            android:layout_gravity="center_horizontal"/>
-    </LinearLayout>
+    <Button
+        android:id="@+id/senior_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="高中难度"
+        android:layout_gravity="center_horizontal"/>
+    <Button
+        android:id="@+id/record_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="查看猜对记录"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"/>
+</LinearLayout>

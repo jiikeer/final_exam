@@ -16,7 +16,14 @@ public class DifficultySelectionActivity extends AppCompatActivity {
         Button primaryButton = findViewById(R.id.primary_button);
         Button middleButton = findViewById(R.id.middle_button);
         Button seniorButton = findViewById(R.id.senior_button);
-
+        // 查看记录按钮
+        Button recordButton = findViewById(R.id.record_button);
+        recordButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(DifficultySelectionActivity.this, RecordActivity.class));
+                    }
+                });
         primaryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

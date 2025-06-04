@@ -1,6 +1,8 @@
 package com.example.final_exam;
 
-public class IdiomModel {
+import java.io.Serializable;
+
+public class IdiomModel implements Serializable {
     private int id;
     private String idiom;
     private String explanation;

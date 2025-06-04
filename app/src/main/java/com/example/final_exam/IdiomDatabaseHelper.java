@@ -1,4 +1,5 @@
 package com.example.final_exam;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -12,6 +13,18 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_IDIOM = "idiom";
     public static final String COLUMN_EXPLANATION = "explanation";
     public static final String COLUMN_LEVEL = "level";
+    // 添加新表记录猜对的成语
+    public static final String TABLE_GUESSED_IDIOMS = "guessed_idioms";
+    public static final String COLUMN_GUESSED_IDIOM = "guessed_idiom";
+    public static final String COLUMN_GUESSED_LEVEL = "level";
+    public static final String COLUMN_TIMESTAMP = "timestamp";
+
+    private static final String CREATE_TABLE_GUESSED_IDIOMS =
+            "CREATE TABLE " + TABLE_GUESSED_IDIOMS + " (" +
+                    COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + // 这个就是 _id
+                    COLUMN_GUESSED_IDIOM + " TEXT NOT NULL, " +
+                    COLUMN_GUESSED_LEVEL + " TEXT NOT NULL, " +
+                    COLUMN_TIMESTAMP + " DATETIME DEFAULT CURRENT_TIMESTAMP);";
 
     private static final String CREATE_TABLE_IDIOMS =
             "CREATE TABLE " + TABLE_IDIOMS + " (" +
@@ -27,14 +40,18 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_IDIOMS);
+        db.execSQL(CREATE_TABLE_GUESSED_IDIOMS); // 添加新表
         // 初始化成语数据
         initIdiomData(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_IDIOMS);
-        onCreate(db);
+        // 升级数据库时添加新表
+        if (oldVersion < 2) {
+            db
+                    .execSQL(CREATE_TABLE_GUESSED_IDIOMS);
+        }
     }
 
     private void initIdiomData(SQLiteDatabase db) {
@@ -73,9 +90,18 @@ public class IdiomDatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void insertIdiom(SQLiteDatabase db, String idiom, String explanation, String level) {
-        String sql = "INSERT INTO " + TABLE_IDIOMS + " (" +
-                COLUMN_IDIOM + ", " + COLUMN_EXPLANATION + ", " + COLUMN_LEVEL + ") VALUES ('" +
-                idiom + "', '" + explanation + "', '" + level + "');";
-        db.execSQL(sql);
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_IDIOM, idiom);
+        values.put(COLUMN_EXPLANATION, explanation);
+        values.put(COLUMN_LEVEL, level);
+        db.insert(TABLE_IDIOMS, null, values);
     }
+    // 添加记录猜对成语的方法
+    public void insertGuessedIdiom(SQLiteDatabase db, String idiom, String level) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_GUESSED_IDIOM, idiom);
+        values.put(COLUMN_GUESSED_LEVEL, level);
+        db.insert(TABLE_GUESSED_IDIOMS, null, values);
+    }
+
 }

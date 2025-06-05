@@ -11,7 +11,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/app"
-        android:label="成语猜猜猜"
+        android:label="Idiom Guess Guess"
         android:roundIcon="@mipmap/app_r"
         android:supportsRtl="true"
         android:theme="@style/Theme.Final_exam"

@@ -11,6 +11,10 @@ android {
     defaultConfig {
         applicationId = "com.example.final_exam"
         minSdk = 24
+        resConfigs("zh","en")
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86_64")
+        }
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -20,11 +24,21 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        debug {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+
         }
     }
     compileOptions {
